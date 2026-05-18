@@ -1,0 +1,16 @@
+import personaje.*
+import cultivos.*
+import game.*
+
+test "hector siembra y cosecha maiz"{
+    const maiz= new Maiz()
+    personaje.position(game.at(5,5))
+    personaje.sembrar()
+    assert.notThat(maiz.estado().esCosechable())
+    personaje.regar()
+    assert.that(maiz.esCosechable())
+    personaje.cosechar()
+    assert.that(personaje.cosechas().contains(maiz))
+
+}
+
