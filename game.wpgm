@@ -10,22 +10,24 @@ program farmville {
 	game.height(10)
 	game.width(10)
 	game.ground("ground.png")
-    personaje.acciones()
-	direcciones.direcciones(personaje)
 	//  VISUALES
+	personaje.acciones()
  	game.addVisualCharacter(personaje)
  	//game.addVisual(new Maiz()) // Se agrega a modo de prueba
  	//game.addVisual(new Tomaco())
 	//game.addVisual(new Trigo())
- 	//  COMIENZA
-	game.start()
-}
 
-object direcciones{
-	method direcciones(personaje){ 
+	/*keyboard.o().onPressDo({personaje.sembrar(new Tomaco())})
+	keyboard.t().onPressDo({personaje.sembrar(new Trigo())})
+	keyboard.m().onPressDo({personaje.sembrar(new Maiz())})
+	keyboard.r().onPressDo({personaje.regar()})
+	keyboard.c().onPressDo({personaje.cosechar()})
+	*/
 	keyboard.left().onPressDo({ personaje.mover(izquierda)})
 	keyboard.right().onPressDo({ personaje.mover(derecha)})
 	keyboard.up().onPressDo({ personaje.mover(arriba)})
 	keyboard.down().onPressDo({ personaje.mover(abajo)})
+	game.start()
 }
-}
+
+

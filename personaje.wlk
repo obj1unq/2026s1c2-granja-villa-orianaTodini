@@ -10,12 +10,18 @@ object personaje {
 		position = nuevaPosition 
 
    }
-   method sembrar(){  
-	
-	 
+   method sembrar(cultivo){  
+	  cultivo.sembrada(cultivo)
+	  game.addVisual(cultivo)
    }
    method regar() {
-	 
+	  self.validarQueHayCultivo()
+     self.cultivosEnMiParcela().forEach({cultivo => cultivo.crecer()})
+   }
+   method validarQueHayCultivo() {
+     if(!self.hayCultivoEnMiParcela()) {
+        self.error("No hay cultivo en mi parcela")
+     }
    }
    method cosechar() {
 	 
@@ -23,10 +29,18 @@ object personaje {
    method vender(){
 	
    }
-   method acciones(){ 
-	//method cultivar(personaje){
-	keyboard.m().onPressDo({self.sembrar(new Maiz(position=self.position()))})
-	keyboard.t().onPressDo({self.sembrar(new Trigo(position=self.position()))})
-	keyboard.o().onPressDo({self.sembrar(new Tomaco(position=self.position()))})
+   method cultivosEnMiParcela(){
+      return game.getObjectsIn(position)
+   }
+   method hayCultivoEnMiParcela(){
+      return self.cultivosEnMiParcela().any({elemento => elemento.esCultivo()})
+   }
+   method acciones(){
+   keyboard.m().onPressDo({self.sembrar(new Maiz(self.position))}) // PREGUNTAR
+   keyboard.t().onPressDo { self.sembrar(new Trigo(self.position)) }
+	keyboard.o().onPressDo({self.sembrar(new Tomaco(self.position))})
+	keyboard.r().onPressDo({self.regar()})
+	keyboard.c().onPressDo({self.cosechar()})
+   }
+}
 
-}}
