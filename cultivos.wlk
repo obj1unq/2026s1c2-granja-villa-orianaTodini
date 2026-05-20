@@ -3,46 +3,46 @@ import personaje.*
 
 class Maiz {
 
-	var property position 
+	var property position = personaje.position()
 	var property estado = maizBebe
-	var property imagen = maizBebe.image()
 	method image() {
 		// TODO: hacer que devuelva la imagen que corresponde
-		return imagen
+		return estado.image()
 	}
 	method sembrada(posicion) {
 		position = posicion
 	}
 	method cosechar(){
-		if(estado.esCosechable()){
-			game.removeVisual(self.image())
+		if(self.esCosechable()){
+			game.removeVisual(self)
 		}
 	}
 	method crecer(){ 
-		if(estado.maizBebe()){
-			estado= maizAdulto
-		} else {
-			estado= maizAdulto 
-		}
-
+		self.cambiarEstado(maizAdulto)
+		} 
+	method cambiarEstado(_nuevoEstado){
+		estado = _nuevoEstado
 	}
 	method costo() {
-	  
+	  return 150
 	}
 	method esCultivo() {
 		return true
 	}
+	method esCosechable() {
+	  return estado.esCosechable()
+	}
 }
 
 class Trigo {
-	var property position 
+	var property position = personaje.position()
 	var property evolucion = 0
   method image(){
-	return "wheat_+evolucion+.png"
+	return "wheat_" + evolucion + ".png"
   }
 	method cosechar(){
 		if(evolucion >= 2){
-			game.removeVisual(self.image())
+			game.removeVisual(self)
 		}
 	}
 	method sembrada(posicion) {
@@ -57,37 +57,43 @@ class Trigo {
 
 	}
 	method costo() {
-	  
+	  return (evolucion - 1 )* 100
 	}
 	method esCultivo() {
 		return true
+	}
+	method esCosechable() {
+	  return evolucion >= 2
 	}
   
 }
 
 class Tomaco {
-	var property position 
+	var property position = personaje.position()
   method image() {
 	return "tomaco_baby.png"
   }
 	method cosechar(){
-		game.addVisual(self.image())
+		game.removeVisual(self)
 	}
 	method sembrada(posicion) {
 		position = posicion
 	}
 	method crecer() {
-   if(position.y() != 10) {
-      position = position.y(game.height() - 1)
+   if(position.y() == game.height()) {
+    position = position.y(0) // COMO HACERLOOOOOOOOOOOOOOO.
    } else {
       position = position.up(1)
    }
 }
 	method costo() {
-	  
+	  return 80
 	} 
 	method esCultivo() {
 		return true
+	}
+	method esCosechable() {
+	  return true
 	}
   
 }
@@ -96,15 +102,16 @@ object maizBebe{
 	return false
   }
   method image() {
-	return "maiz_bebe.png"
+	return "corn_baby.png"
   }
 }
+
 object maizAdulto {
   method esCosechable() {
 	return true
   }
   method image() {
-	return "maiz_adulto.png"
+	return "corn_adult.png"
   }
 }
 

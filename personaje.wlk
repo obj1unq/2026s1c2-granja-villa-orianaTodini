@@ -3,6 +3,8 @@ import cultivos.*
 
 object personaje {
 	var property position = game.center()
+   var property monedas = 0
+   var property  cosechas= []
 	const property image = "fplayer.png"
    
    method mover(direccion) {
@@ -11,42 +13,72 @@ object personaje {
 
    }
    method sembrar(cultivo){ 
-      if(! self.hayCultivoPlantadoAca()){ 
-	  cultivo.sembrada(cultivo)
-	  game.addVisual(cultivo)
+      if(self.esParcelaVacia()){ 
+          game.addVisual(cultivo)
+	       cultivo.sembrada(self.position())
       }
-   }
-   method hayCultivoPlantadoAca() {
-     return game.getObjectsIn(personaje.position).isEmpty() // Arreglar
    }
 
    method regar() {
 	  self.validarQueHayCultivo()
-     self.cultivosEnMiParcela().forEach({cultivo => cultivo.crecer()})
+     self.cultivosEnParcela().forEach({cultivo => cultivo.crecer()})
    }
    method validarQueHayCultivo() {
-     if(!self.hayCultivoEnMiParcela()) {
-        self.error("No hay cultivo en mi parcela")
+     if(self.esParcelaVacia()) {
+        self.error("No hay nada para regar")
      }
    }
    method cosechar() {
-	 
+	 self.validarQueHayCultivoParaCosechar()
+    self.cosechasListasParaSerVendidas()
+    self.cultivosCosechables()
+   }
+   method cultivosCosechables() {
+      self.cosechas().forEach({cultivo => self.cosecharCultivo(cultivo)})
+   }
+   method cosechasListasParaSerVendidas() {
+     cosechas= cosechas + self.cultivosEnParcela().filter({cultivo => cultivo.esCosechable()})
+   }
+   method cosecharCultivo(cultivo){
+         cultivo.cosechar()
+   }
+   method validarQueHayCultivoParaCosechar() {
+    if(!self.hayCultivoCosechableEnMiParcela()) {
+        self.error("No tengo nada para cosechar")
+    }
+   }
+   method hayCultivoCosechableEnMiParcela() {
+      return self.cultivosEnParcela().any({cultivo => cultivo.esCosechable()})
    }
    method vender(){
-	
+      if(cosechas.isEmpty()){
+         self.error("no tengo nada para vender")
+      } else {
+         monedas = monedas + cosechas.sum({cultivo => cultivo.costo()})
+         cosechas.clear()
+      }
    }
-   method cultivosEnMiParcela(){
-      return game.getObjectsIn(position)
-   }
-   method hayCultivoEnMiParcela(){
-      return self.cultivosEnMiParcela().any({elemento => elemento.esCultivo()})
+   method mostrarEstado() {
+    return game.say(self,
+        "tengo " + monedas.toString() +" monedas, y " + cosechas.size().toString() +
+        " plantas para vender"
+    )
+}
+   method cultivosEnParcela() {
+    return game.getObjectsIn(self.position())
+        .filter({objeto => objeto != self && objeto.esCultivo()})
+}
+   method esParcelaVacia(){
+      return self.cultivosEnParcela().isEmpty()
    }
    method acciones(){
-   keyboard.m().onPressDo({self.sembrar(new Maiz(position= position))}) 
-   keyboard.t().onPressDo {self.sembrar(new Trigo(position=position)) }
-	keyboard.o().onPressDo({self.sembrar(new Tomaco(position= position))})
+   keyboard.m().onPressDo({self.sembrar(new Maiz())}) 
+   keyboard.t().onPressDo({self.sembrar(new Trigo()) })
+	keyboard.o().onPressDo({self.sembrar(new Tomaco())})
 	keyboard.r().onPressDo({self.regar()})
 	keyboard.c().onPressDo({self.cosechar()})
+   keyboard.v().onPressDo({self.vender()})
+   keyboard.space().onPressDo({self.mostrarEstado()})
    }
 }
 
