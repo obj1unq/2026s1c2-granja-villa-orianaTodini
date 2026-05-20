@@ -10,10 +10,16 @@ object personaje {
 		position = nuevaPosition 
 
    }
-   method sembrar(cultivo){  
+   method sembrar(cultivo){ 
+      if(! self.hayCultivoPlantadoAca()){ 
 	  cultivo.sembrada(cultivo)
 	  game.addVisual(cultivo)
+      }
    }
+   method hayCultivoPlantadoAca() {
+     return game.getObjectsIn(personaje.position).isEmpty() // Arreglar
+   }
+
    method regar() {
 	  self.validarQueHayCultivo()
      self.cultivosEnMiParcela().forEach({cultivo => cultivo.crecer()})
@@ -36,9 +42,9 @@ object personaje {
       return self.cultivosEnMiParcela().any({elemento => elemento.esCultivo()})
    }
    method acciones(){
-   keyboard.m().onPressDo({self.sembrar(new Maiz(self.position))}) // PREGUNTAR
-   keyboard.t().onPressDo { self.sembrar(new Trigo(self.position)) }
-	keyboard.o().onPressDo({self.sembrar(new Tomaco(self.position))})
+   keyboard.m().onPressDo({self.sembrar(new Maiz(position= position))}) 
+   keyboard.t().onPressDo {self.sembrar(new Trigo(position=position)) }
+	keyboard.o().onPressDo({self.sembrar(new Tomaco(position= position))})
 	keyboard.r().onPressDo({self.regar()})
 	keyboard.c().onPressDo({self.cosechar()})
    }
