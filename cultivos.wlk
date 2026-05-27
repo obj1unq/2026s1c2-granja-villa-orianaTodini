@@ -1,9 +1,9 @@
  import wollok.game.*
 import personaje.*
-
+import mercado.*
 class Maiz {
 
-	var property position = personaje.position()
+	var property position 
 	var property estado = maizBebe
 	method image() {
 		// TODO: hacer que devuelva la imagen que corresponde
@@ -32,16 +32,19 @@ class Maiz {
 	method esCosechable() {
 	  return estado.esCosechable()
 	}
+	method esMercado(){
+		return false
+	}
 }
 
 class Trigo {
-	var property position = personaje.position()
-	var property evolucion = 0
+	var property position 
+	var property estado = 0
   method image(){
-	return "wheat_" + evolucion + ".png"
+	return "wheat_" + estado + ".png"
   }
 	method cosechar(){
-		if(evolucion >= 2){
+		if(estado >= 2){
 			game.removeVisual(self)
 		}
 	}
@@ -49,30 +52,34 @@ class Trigo {
 		position = posicion
 	}
 	method crecer(){ 
-		if(evolucion == 3){
-			evolucion = 0
+		if(estado == 3){
+			estado = 0
 		} else {
-			evolucion = evolucion + 1
+			estado = estado + 1
 		}
 
 	}
 	method costo() {
-	  return (evolucion - 1 )* 100
+	  return (estado - 1 )* 100
 	}
 	method esCultivo() {
 		return true
 	}
 	method esCosechable() {
-	  return evolucion >= 2
+	  return estado >= 2
+	}
+	method esMercado(){
+		return false
 	}
   
 }
 
 class Tomaco {
-	var property position = personaje.position()
-  method image() {
-	return "tomaco_baby.png"
-  }
+	var property position 	
+	var property estado = tomacoBebe
+    method image() {
+	    return estado.image()
+    }
 	method cosechar(){
 		game.removeVisual(self)
 	}
@@ -80,14 +87,42 @@ class Tomaco {
 		position = posicion
 	}
 	method crecer() {
-   if(position.y() == game.height()) {
-    position = position.y(0) // COMO HACERLOOOOOOOOOOOOOOO.
-   } else {
-      position = position.up(1)
-   }
-}
+	    self.hacerMaduro() 
+	}
+	method cambiarImagen(_nuevaImagen) {
+		estado = _nuevaImagen
+	}
+	method hacerMaduro() {
+        if (self.estaAlBordeSuperior()) {
+			self.replantarEnElBordeInferior()
+        } else {
+           self.replantarTomacoUnaParcelaArriba()
+        }
+    }
+    method estaAlBordeSuperior(){
+	    return self.position().y() == game.height() - 1
+    }
+    method replantarEnElBordeInferior(){
+	    self.position(game.at(self.position().x(), 0))
+	    self.validarSiEsParcelaVacia()
+		self.cambiarImagen(tomacoAdulto)
+    }
+    method replantarTomacoUnaParcelaArriba(){
+	    self.position(self.position().up(1))
+	    self.cambiarImagen(tomacoAdulto)
+    }
+    method validarSiEsParcelaVacia(){
+        if (!self.cultivosEnParcela().isEmpty()) {
+            personaje.error("Hay un cultivo plantado en la parte inferior")
+        }
+    
+	}
+    method cultivosEnParcela() {
+        return game.getObjectsIn(self.position()).filter({objeto => objeto != self && objeto.esCultivo()})
+    }
+    
 	method costo() {
-	  return 80
+	    return 80
 	} 
 	method esCultivo() {
 		return true
@@ -95,7 +130,26 @@ class Tomaco {
 	method esCosechable() {
 	  return true
 	}
+	method esMercado(){
+		return false
+	}
   
+}
+object tomacoBebe{
+	  method image() {
+	return "tomaco_baby.png"
+  }
+  method esCosechable() {
+	return false
+  }
+}
+object tomacoAdulto {
+  method image() {
+	return "tomaco.png"
+  }
+  method esCosechable() {
+	return true
+  }
 }
 object maizBebe{
   method esCosechable() {
