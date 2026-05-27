@@ -1,18 +1,29 @@
 import wollok.game.*
 import personaje.*
 import cultivos.*
-
+import direcciones.*
+import mercado.*
 program farmville {
 	//  CONFIG	
 	game.title("La granja")
 	game.height(10)
 	game.width(10)
 	game.ground("ground.png")
-
 	//  VISUALES
- 	game.addVisualCharacter(personaje)
- 	game.addVisual(new Maiz()) // Se agrega a modo de prueba
- 	
- 	//  COMIENZA
+	personaje.acciones()
+
+	const  mercado1 = new Mercado(position = game.at(9,5))
+	const  mercado2 = new Mercado(position = game.at(3,2))
+	const  mercado3 = new Mercado(position = game.at(6,8))
+	game.addVisual(mercado1)
+	game.addVisual(mercado2)
+	game.addVisual(mercado3)
+	game.addVisualCharacter(personaje)
+	keyboard.left().onPressDo({ personaje.mover(izquierda)})
+	keyboard.right().onPressDo({ personaje.mover(derecha)})
+	keyboard.up().onPressDo({ personaje.mover(arriba)})
+	keyboard.down().onPressDo({ personaje.mover(abajo)})
 	game.start()
 }
+
+
